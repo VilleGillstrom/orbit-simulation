@@ -65,7 +65,8 @@ function [] = plot_orbit(x,y,vx,vy,ax,ay,t,m,M)
 end
 
 function [] = plot_ek_ep(x,y,vx, vy, M, m, G, t)
-	r=@(x,y) sqrt((x)^2+(y)^2);
+
+    r=@(x1,y1,x2,y2) (sqrt(((x1-x2)^2) + ((y1-y2)^2)));
     
     steps = length(vx);
     Ek = zeros(steps,1);
@@ -73,7 +74,7 @@ function [] = plot_ek_ep(x,y,vx, vy, M, m, G, t)
     
     for i = 1:steps
         Ek(i) = (m * (vx(i)^2 + vy(i)^2) / 2) + (M * (0) / 2);
-        Ep(i) = -G * (M*m) / r(x(i),y(i));
+        Ep(i) = -G * (M*m) / r(0,0,x(i),y(i));
     end
     
     figure

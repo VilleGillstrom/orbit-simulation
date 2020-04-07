@@ -43,3 +43,4 @@ for  i=1:N
     ax(i) = Fx_tot / m(i);
     ay(i) = Fy_tot / m(i);
 end
+end

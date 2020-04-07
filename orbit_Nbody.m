@@ -37,6 +37,7 @@ for i=1:steps
     % update velocity
     vx(:, i+1) = vx(:,i) + ((ax(:,i) + ax(:,i+1)) / 2) * dt;
     vy(:, i+1) = vy(:,i) + ((ay(:,i) + ay(:,i+1)) / 2) * dt;
+       
   
 end
 end

@@ -1,25 +1,28 @@
-function [] = orbit_Nbody_plotter(x,y,vx,vy,ax,ay,t, G, m)
-    plot_orbit(x,y,vx,vy,ax,ay,t,m);   
-   % plot_ek_ep(x,y, vx, vy,  m, G, t);
-   % plot_p(x,y, vx, vy,  m, G, t);
+function [] = orbit_Nbody_plotter(x,y,vx,vy,ax,ay,t, G, m, body_labels)
+    
+    plot_orbit(x,y,vx,vy,ax,ay,t,m, body_labels);   
+    plot_ek_ep(x,y, vx, vy,  m, G, t);
+    plot_p(vx, vy,  m, t, body_labels);
+    plot_ek(vx, vy,  m, t)
+    plot_ep(x, y, G, m, t)
 end
 
-
-function [] = plot_p(x,y,vx, vy,  m, G, t)
+function plot_p(vx, vy,  m, t, labels)
     N = length(m);
     steps = length(vx);
     P = zeros(N,steps,1);
     p_tot = zeros(steps,1);
+    plotLabels = labels;
+    
     for i = 1:steps
         for n = 1:N
             xx = m(n)*vx(n,i);
             yy = m(n)*vy(n,i);
             P(n,i) =  xx + yy;
-            
         end
         p_tot(i) = sum(P(:,i));
     end
-    
+
     figure
     title("Momentum") 
     hold on
@@ -27,23 +30,16 @@ function [] = plot_p(x,y,vx, vy,  m, G, t)
     xlabel('t') 
     ylabel('p') 
     
-    planets = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"] 
-    plotLabels = cell(1,N+1);
-    for  i = 1:N
-        plot(t, P(i,:));  
-        plotLabels{i} = planets(i);
-   
-    end
+    plot(t, P);  
     plot(t,p_tot)
-    plotLabels{N+1} = "Sum";
+    
+    plotLabels{N+1} = 'Sum';
     legend(plotLabels,'Location','northeast')
     
     
-    %legend({'y = Ek','y = Ep','y = Ep+Ek'},'Location','northeast')
-    
 end
 
-function [] = plot_orbit(x,y,vx,vy,ax,ay,t,m)
+function plot_orbit(x,y,vx,vy,ax,ay,t,m, labels)
     N = length(m);
 
     %Mass centrum
@@ -73,100 +69,93 @@ function [] = plot_orbit(x,y,vx,vy,ax,ay,t,m)
     ylabel('y') 
     
     s = ceil(length(x) / 10);
-    plotLabels = cell(1,N);
-    for i = 1:N
-        a = x(i,:);
-        b = y(i,:);
-        plot(a,b) ;
-        plotLabels{i} = num2str(i);
+    plotLabels = labels;
+    for i = 1:N 
+        plot(x(i,:),y(i,:));
+        
+        % Plots velocity and acceleration
         %quiver(x(1:s:end),y(1:s:end), vx(1:s:end),vy(1:s:end),1,'r')
         %quiver(x(1:s:end),y(1:s:end), ax(1:s:end),ay(1:s:end),1,'g')
     end
-   % plot mass centrum
     
+   % plot center of mass 
     plot(rcmx,rcmy,'.');
-    plot(rcmx, rcmy);
+    plotLabels{end+1} = 'Center of mass';
+    
     legend(plotLabels,'Location','southwest')
-    
-  
-    
-    % plot satellite velocity and acceleration vectors
-   % 
-  
 end
 
-function [] = plot_ek_ep(x,y,vx, vy,  m, G, t)
-	
-    
-    N = length(m);
-    steps = length(vx);
-    Ek = zeros(N, steps,1);
-    Ep = zeros(N, steps,1);
-    
-    Ek_tot = zeros(steps,1);
-    Ep_tot = zeros(steps,1);
-    
-    for i = 1:steps
-        for n = 1:N
-            vxx = vx(n,i);
-            vyy = vy(n,i);
-            v = (vxx + vyy);
-            Ek(n,i) = ((m(n) * v^2) / 2);  
-        end
-        Ek_tot(i) = sum(Ek(:,i));
-    end
-    
+function [Ek] = compute_Ek(m, vx, vy)
+    % Total kinetic energy per body
+    Ek_N = ((m(:) .* vx.^2) / 2) + ((m(:) .* vy.^2) / 2);
+    % Total kinetic energy
+    Ek = sum(Ek_N).'; % Transpose to match Ep shape
+end
+
+function [Ep] = compute_Ep(m, x, y, G)
+    steps = length(x); % Total timesteps
+    N = length(m);     % Number of bodies
+    Ep = zeros(steps,1);
     r=@(x1,y1,x2,y2) (sqrt(((x1-x2)^2) + ((y1-y2)^2)));
-    
-    foo = 0;
     for i = 1:steps
-        foo = 0;
-        for n = 1:N
+        Epi = 0;
+         for n = 1:N
             mi = m(n);
+            xi = x(n,i);
+            yi = y(n,i);
             for k = n+1:N
-                xi = x(n,i);
-                yi = y(n,i);
                 xj = x(k,i);
                 yj = y(k,i);
                 mj = m(k);
-                
-                
                 rij = r(xi,yi,xj,yj);
-                Ep(n,i) = Ep(n,i) + (mi*mj/ rij);
-                %Ep(k,i) = Ep(k,i) + m(n)*m(k) / rij;
-                foo = foo + (mi*mj/ rij);
+                
+                Epi = Epi + (mi*mj/ rij);
+
             end
         end
-        
-        %Ep_tot(i) = -G * sum(Ep(:,i));
-        Ep_tot(i) = -G * foo;
+       Ep(i) = -G * Epi;
     end
+end
+
+function plot_ek(vx, vy, m, t)
+    Ek = compute_Ek(m, vx, vy);
     
-   
     figure
-    title("Energy in system")
+    title("Ek")
     hold on
     grid on
-    xlabel('t') 
-    planets = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
-    plotLabels = cell(1,N);
-    title("Ek")
-    plot(t, Ek_tot);
+    xlabel('t (s)') 
+    plot(t, Ek);
+    legend(["Ek"],'Location','northeast');
+end
+
+function plot_ep(x, y, G, m, t)
+    Ep = compute_Ep(m, x, y, G);
+    
     figure
     title("Ep")
     hold on
-    plot(t, Ep_tot);
-    for  i = 1:N
-          
-       % plot(t, Ep(i,:));
-      % plot(t, Ek(i,:));  
-       % plot(t, Ep(i,:));
-        plotLabels{i} = planets(i);
-    end
-    %legend(plotLabels,'Location','northeast')
-   % plot(t, Ek, 'r'); 
-    %plot(t, Ep, 'b');
-   % plot(t, Ep+Ek, 'g');
+    grid on
+    xlabel('t (s)') 
+  
+    plot(t, Ep);
+    legend(["Ep"],'Location','northeast');
+end
+
+function plot_ek_ep(x,y,vx, vy,  m, G, t)
+    Ek = compute_Ek(m, vx, vy);
+    Ep = compute_Ep(m, x, y, G);
     
-   % legend({'y = Ek','y = Ep','y = Ep+Ek'},'Location','northeast')
+    figure
+    title("Ep and Ek")
+    hold on
+    grid on
+    xlabel('t (s)') 
+
+    plot(t, Ek);
+    plot(t, Ep);
+    plot(t, Ep + Ek);
+    
+    legend(["Ek", "Ep", "Ek + Ep"],'Location','northeast')
+    
 end

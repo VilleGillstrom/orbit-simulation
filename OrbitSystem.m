@@ -1,5 +1,5 @@
 classdef OrbitSystem < handle
-    %SYSTEM Helper class to create and run simulations
+    %OrbitSystem Helper class to create and run simulations
   
     properties
         % Needed to run simulation
@@ -17,23 +17,37 @@ classdef OrbitSystem < handle
         vy % y velocities [vy(3,5) is 3rd body's y velocity at timestep 5]
         ax % x accelerations [ax(3,5) is 3rd body's x acceleration at timestep 5]
         ay % y accelerations [ay(3,5) is 3rd body's y acceleration at timestep 5]
-        t % t timesteps
+        t % t times
+        
+        % Extra
+        plot_labels % Name for each body
     end
     
     methods
-        function obj = system( G,m, x0, y0, vx0,vy0)
-            obj.G = G;
-            obj.m = m;
-            obj.x0 = x0;
-            obj.y0 = y0;
-            obj.vx0 = vx0;
-            obj.vy0 = vy0;
+        function obj = OrbitSystem( )
+            obj.m   = zeros(0,1);
+            obj.x0	= zeros(0,1);
+            obj.y0	= zeros(0,1);
+            obj.vx0	= zeros(0,1);
+            obj.vy0	= zeros(0,1);
+            obj.plot_labels	= strings(0,1);
         end
 
+        % Add a body to the model
+        function add_body(obj, body)
+            idx = length(obj.m) + 1;
+            obj.m(idx)              = body.m;
+            obj.x0(idx)             = body.x;
+            obj.y0(idx)             = body.y;
+            obj.vx0(idx)            = body.vx;
+            obj.vy0(idx)            = body.vy;
+            obj.plot_labels(idx)    = body.plot_label;
+        end
+        
+        % Run a simulation, returns and saves result(to self)
         function [x,y,vx,vy,ax,ay,t] = simulate(obj, dt, tmax)
             [x,y,vx,vy,ax,ay,t] = ... 
                 orbit_Nbody(obj.G, obj.m, obj.x0, obj.y0, obj.vx0,obj.vy0,dt,tmax); 
-            
              obj.x = x;
              obj.y = y;
              obj.vx = vx;
@@ -41,82 +55,101 @@ classdef OrbitSystem < handle
              obj.ax = ax;
              obj.ay = ay;
              obj.t  = t;
-             
-             
+        end
+         
+        % Create plots
+        function plot(obj)
+            orbit_Nbody_plotter(obj.x,obj.y,obj.vx,obj.vy,obj.ax,obj.ay, obj.t, obj.G, obj.m, obj.plot_labels)
         end
         
-        function plot(obj)
-            orbit_Nbody_plotter(obj.x,obj.y,obj.vx,obj.vy,obj.ax,obj.ay, obj.t, obj.G, obj.m)
+        % Change the velocity on body at idx to make center of mass static
+        % Pick the sun or big center planet
+        function staticify_center_of_mass(obj, body_idx)
+            [vx_, vy_] = vel_for_static_com(obj.m(body_idx), obj.m,obj.vx0, obj.vy0);
+            obj.vx0(body_idx) = obj.vx0(body_idx) + vx_;
+            obj.vy0(body_idx) = obj.vy0(body_idx) + vy_;
         end
     end
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Various models           %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods(Static)
+        %The base case from assignment
         function os = SimpleSystem()
             os = OrbitSystem;
             os.G = 1.0;
-            os.m = [10, 1];
-            os.x0 = [0,10];
-            os.y0 = [0,0];
-            os.vx0 = [0,0];
-            os.vy0 =  [-0.075, 0.75];
+            planet      = struct('plot_label', 'planet', 'm', 10, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
+            satellite   = struct('plot_label', 'satellite' ,'m', 1, 'x', 10, 'y',0, 'vx', 0, 'vy', 0.75);
+
+            os.add_body(planet);
+            os.add_body(satellite)
+            
+            % This line adds celocity to the planet nr 1
+            % to make center of  mass unchanging
+            os.staticify_center_of_mass(1);
+            
         end
         
-        function os = ISS()
-            orbital_speed = @(G,M,R) sqrt(G*M./R);
-            
+        %REQUIRES SMALL dt ~0.00001
+        function os = ISS() 
             os = OrbitSystem;
             os.G = 6.67408*10^-11;
-            os.m = [5.972*10^24, 450*10^3];
-            os.x0 = [0, 400*10^3];
-            os.y0 = [0, 0];
-            os.vx0 = [0, 0];
-            os.vy0 =  [0, 7700];
-        end
-        % orbital_speed(os.G, 5.97E2, 408*10^3)
+            earth = struct('plot_label', 'Earth', 'm', 5.972E24,'x',   0E0,'y',0,'vx', 0, 'vy',    0);
+            iss   = struct('plot_label', 'ISS', 'm',   450E03,'x', 400E3,'y',0,'vx', 0, 'vy', 7700);
+            
+            os.add_body(earth);
+            os.add_body(iss);   
+        end   
         
+        %Faked orbit
         function os = SolarSystem()
             orbital_speed = @(G,M,R) sqrt(G*M./R);
-            
-            %masses 
-             m= [1.99E30
-                3.31E24
-                4.87E24
-                5.97E24
-                6.39E23
-             %   1.90E27
-             %   5.68E26
-             %   8.68E25
-            %   1.02E26
-                  
-            ];
-            
-            x = [
-                0 %sun
-                5.79E10
-                1.08E11
-                1.50E11
-                2.28E11
-               % 7.79E11
-              %  1.43E12
-              %  2.87E12
-              %  4.50E12
-             ];
-            
-            y = [0 0  0 0 0 ];       % 0 0 0 0
-            vx = [0 0  0 0 0 ]; %0 0 0 0
-        
             os = OrbitSystem;
+            %planets = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"] 
             os.G = 1.0;
-  
-            vy = orbital_speed(os.G, m(1),  x);
-            vy(1) = 0; % The sun
-            os.m = m;
-            os.x0 = x;
-            os.y0 = y;
-            os.vx0 = vx;
-            os.vy0 =  vy;
+            %Source google searches: <planet> mass, <planet> distance from sun
+            sun     = struct('plot_label', 'Sun','m', 1.989E30, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
+                      
+            mercury = struct('plot_label', 'Mercury','m', 3.285E23, 'x', 67.162E9, 'y',0, 'vx', 0);
+            mercury.vy = orbital_speed(os.G, sun.m,  mercury.x);
+            
+            venus   = struct('plot_label', 'Venus','m', 4.876E24, 'x', 107.57E9, 'y',0, 'vx', 0);
+            venus.vy = orbital_speed(os.G, sun.m,  venus.x);
+            
+            earth   = struct('plot_label', 'Earth','m', 5.972E24, 'x', 149.77E9, 'y',0, 'vx', 0);
+            earth.vy = orbital_speed(os.G, sun.m,  earth.x);
+           
+            mars    = struct('plot_label', 'Mars','m', 6.390E23, 'x', 220.82E9, 'y',0, 'vx', 0);
+            mars.vy = orbital_speed(os.G, sun.m,  mars.x);
+           
+            jupiter = struct('plot_label', 'Jupiter','m', 1.898E27, 'x', 777.11E9,  'y',0, 'vx', 0);
+            jupiter.vy = orbital_speed(os.G, sun.m,  jupiter.x);
+            
+            saturn  = struct('plot_label', 'Saturn','m', 5.683E26, 'x', 1.4967E12, 'y',0, 'vx', 0);
+            saturn.vy = orbital_speed(os.G, sun.m,  saturn.x);
+           
+            uranus  = struct('plot_label', 'Uranus','m', 8.681E25, 'x', 2.963E12,  'y',0, 'vx', 0);
+            uranus.vy = orbital_speed(os.G, sun.m,  uranus.x);
+           
+            neptune = struct('plot_label', 'Neptune','m', 1.024E26, 'x', 4.4769E12, 'y',0, 'vx', 0);
+            neptune.vy = orbital_speed(os.G, sun.m,  neptune.x);
+            
+            
+           
+            os.add_body(sun);
+            os.add_body(mercury);
+            os.add_body(venus);
+            os.add_body(earth);
+            os.add_body(mars);
+           % os.add_body(jupiter);
+           % os.add_body(saturn);
+           % os.add_body(uranus);
+           % os.add_body(neptune);
+           
+           
+           % os.staticify_center_of_mass(1);
         end
-        
-        
+   
     end
 end
