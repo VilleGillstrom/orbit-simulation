@@ -13,8 +13,7 @@ for i = 2:length(t)
     r = [x(i), y(i)] / norm([x(i), y(i)]); % Current vector to sattelite
     time = time + (t(i) - t(i-1)); % Accumulate time
     
-    % Dot product between initial orhogonal vector and current 
-    % satellite position
+    % Dot product between initial and current satellite position
     c = dot(v0, r); 
  
     if(hasReachedHalfOrbit == false)

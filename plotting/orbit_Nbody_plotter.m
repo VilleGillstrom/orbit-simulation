@@ -148,7 +148,7 @@ function [Ep] = compute_Ep(m, x, y, G)
     Ep = zeros(steps,1);
     r=@(x1,y1,x2,y2) (sqrt(((x1-x2)^2) + ((y1-y2)^2)));
     for i = 1:steps
-        Epi = 0;
+        Epi = 0; % Ep for timestep i
          for n = 1:N
             mi = m(n);
             xi = x(n,i);
@@ -157,8 +157,7 @@ function [Ep] = compute_Ep(m, x, y, G)
                 xj = x(k,i);
                 yj = y(k,i);
                 mj = m(k);
-                rij = r(xi,yi,xj,yj);
-                
+                rij = r(xi,yi,xj,yj); 
                 Epi = Epi + (mi*mj/ rij);
 
             end
