@@ -79,7 +79,7 @@ classdef OrbitSystem < handle
         function os = SimpleSystem()
             os = OrbitSystem;
             os.G = 1.0;
-            planet      = struct('plot_label', 'planet', 'm', 10, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
+            planet      = struct('plot_label', 'planet', 'm', 10, 'x', 0, 'y',0, 'vx', 0, 'vy', 1);
             satellite   = struct('plot_label', 'satellite' ,'m', 1, 'x', 10, 'y',0, 'vx', 0, 'vy', 0.75);
 
             os.add_body(planet);

@@ -3,8 +3,8 @@ function [Vx, Vy] = vel_for_static_com(M,m,vx, vy)
 %center of mass static
 %   input:
 %   M - mass of body
-%   m - mass of all other bodies 
-%   v - velocity of all other bodies
+%   m - mass of bodies 
+%   v - velocity of all bodies
 %   output:
 %   V- velocity for M to achieve static center of mass
     mvx = m*(vx).'; 

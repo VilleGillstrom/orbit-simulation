@@ -3,7 +3,7 @@
 
 
 solar = OrbitSystem.SimpleSystem();
-tic; solar.simulate(0.001,500); toc;
+tic; solar.simulate(0.001,100); toc;
 tic; solar.plot();toc;
 %end
 

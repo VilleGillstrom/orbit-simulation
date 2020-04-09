@@ -7,6 +7,7 @@ function [] = orbit_Nbody_plotter(x,y,vx,vy,ax,ay,t, G, m, body_labels)
     plot_ep(x, y, G, m, t)
 end
 
+% plot rorelsemängd
 function plot_p(vx, vy,  m, t, labels)
     N = length(m);
     steps = length(vx);
@@ -39,6 +40,7 @@ function plot_p(vx, vy,  m, t, labels)
     
 end
 
+% plot orbits
 function plot_orbit(x,y,vx,vy,ax,ay,t,m, labels)
     N = length(m);
 
@@ -85,6 +87,53 @@ function plot_orbit(x,y,vx,vy,ax,ay,t,m, labels)
     legend(plotLabels,'Location','southwest')
 end
 
+% plot Ek
+function plot_ek(vx, vy, m, t)
+    Ek = compute_Ek(m, vx, vy);
+    
+    figure
+    title("Ek")
+    hold on
+    grid on
+    xlabel('t (s)') 
+    plot(t, Ek);
+    legend(["Ek"],'Location','northeast');
+end
+
+% plot Ep
+function plot_ep(x, y, G, m, t)
+    Ep = compute_Ep(m, x, y, G);
+    
+    figure
+    title("Ep")
+    hold on
+    grid on
+    xlabel('t (s)') 
+  
+    plot(t, Ep);
+    legend(["Ep"],'Location','northeast');
+end
+
+% plot Ek, Ep and Ek+Ep
+function plot_ek_ep(x,y,vx, vy,  m, G, t)
+    Ek = compute_Ek(m, vx, vy);
+    Ep = compute_Ep(m, x, y, G);
+    
+    figure
+    title("Ep and Ek")
+    hold on
+    grid on
+    xlabel('t (s)') 
+
+    plot(t, Ek);
+    plot(t, Ep);
+    plot(t, Ep + Ek);
+    
+    legend(["Ek", "Ep", "Ek + Ep"],'Location','northeast')
+    
+end
+
+% Compute Ek
 function [Ek] = compute_Ek(m, vx, vy)
     % Total kinetic energy per body
     Ek_N = ((m(:) .* vx.^2) / 2) + ((m(:) .* vy.^2) / 2);
@@ -92,6 +141,7 @@ function [Ek] = compute_Ek(m, vx, vy)
     Ek = sum(Ek_N).'; % Transpose to match Ep shape
 end
 
+% Compute Ep
 function [Ep] = compute_Ep(m, x, y, G)
     steps = length(x); % Total timesteps
     N = length(m);     % Number of bodies
@@ -115,47 +165,4 @@ function [Ep] = compute_Ep(m, x, y, G)
         end
        Ep(i) = -G * Epi;
     end
-end
-
-function plot_ek(vx, vy, m, t)
-    Ek = compute_Ek(m, vx, vy);
-    
-    figure
-    title("Ek")
-    hold on
-    grid on
-    xlabel('t (s)') 
-    plot(t, Ek);
-    legend(["Ek"],'Location','northeast');
-end
-
-function plot_ep(x, y, G, m, t)
-    Ep = compute_Ep(m, x, y, G);
-    
-    figure
-    title("Ep")
-    hold on
-    grid on
-    xlabel('t (s)') 
-  
-    plot(t, Ep);
-    legend(["Ep"],'Location','northeast');
-end
-
-function plot_ek_ep(x,y,vx, vy,  m, G, t)
-    Ek = compute_Ek(m, vx, vy);
-    Ep = compute_Ep(m, x, y, G);
-    
-    figure
-    title("Ep and Ek")
-    hold on
-    grid on
-    xlabel('t (s)') 
-
-    plot(t, Ek);
-    plot(t, Ep);
-    plot(t, Ep + Ek);
-    
-    legend(["Ek", "Ep", "Ek + Ep"],'Location','northeast')
-    
 end
