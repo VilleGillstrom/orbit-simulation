@@ -1,10 +1,10 @@
 function [] = orbit_Nbody_plotter(x,y,vx,vy,ax,ay,t, G, m, body_labels)
     
     plot_orbit(x,y,vx,vy,ax,ay,t,m, body_labels);   
-    plot_ek_ep(x,y, vx, vy,  m, G, t);
-    plot_p(vx, vy,  m, t, body_labels);
-    plot_ek(vx, vy,  m, t)
-    plot_ep(x, y, G, m, t)
+    %plot_ek_ep(x,y, vx, vy,  m, G, t);
+    %plot_p(vx, vy,  m, t, body_labels);
+    %plot_ek(vx, vy,  m, t)
+    %plot_ep(x, y, G, m, t)
 end
 
 % plot rorelsemängd
@@ -135,8 +135,8 @@ end
 
 % Compute Ek
 function [Ek] = compute_Ek(m, vx, vy)
-    % Total kinetic energy per body
-    Ek_N = ((m(:) .* vx.^2) / 2) + ((m(:) .* vy.^2) / 2);
+    Ek_N = (m(:) .* ((vx.^2 + vy.^2)) / 2);
+    %Ek_N = ((m(:) .* vx.^2) / 2) + ((m(:) .* vy.^2) / 2);
     % Total kinetic energy
     Ek = sum(Ek_N).'; % Transpose to match Ep shape
 end

@@ -2,10 +2,19 @@
 %run_orbit_1body()
 
 
-solar = OrbitSystem.SimpleSystem();
-tic; solar.simulate(0.001,100); toc;
-tic; solar.plot();toc;
-%end
+%os = OrbitSystem.ISS();
+%tic; os.simulate(50,32*10E6); toc;
+%tic; os.plot();toc;
+%[iss] = orbit_time(os.x(1,:), os.y(1,:),os.t)
+
+os = OrbitSystem.SolarSystem();
+tic; os.simulate(50,32*10E6); toc;
+tic; os.plot();toc;
+[mercury_time] = orbit_time(os.x(2,:), os.y(2,:),os.t)
+[venus_time] = orbit_time(os.x(3,:), os.y(3,:),os.t)
+[earth_time] = orbit_time(os.x(4,:), os.y(4,:),os.t)
+[mars_time] = orbit_time(os.x(5,:), os.y(5,:),os.t)
+
 
 %Runs orbit_1body with base stuff
 function run_orbit_1body() 
