@@ -1,10 +1,11 @@
 function [] = orbit_Nbody_plotter(x,y,vx,vy,ax,ay,t, G, m, body_labels)
     
-    plot_orbit(x,y,vx,vy,ax,ay,t,m, body_labels);   
-    %plot_ek_ep(x,y, vx, vy,  m, G, t);
-    %plot_p(vx, vy,  m, t, body_labels);
-    %plot_ek(vx, vy,  m, t)
-    %plot_ep(x, y, G, m, t)
+   plot_orbit(x,y,vx,vy,ax,ay,t,m, body_labels);   
+   % plot_ek_ep(x,y, vx, vy,  m, G, t);
+   plot_p(vx, vy,  m, t, body_labels);
+    
+  %  plot_ek(vx, vy,  m, t)
+   % plot_ep(x, y, G, m, t)
 end
 
 % plot rorelsemängd
@@ -12,16 +13,27 @@ function plot_p(vx, vy,  m, t, labels)
     N = length(m);
     steps = length(vx);
     P = zeros(N,steps,1);
+    Px = zeros(N,steps,1);
+    Py = zeros(N,steps,1);
+   
     p_tot = zeros(steps,1);
+    p_totx = zeros(steps,1);
+    p_toty = zeros(steps,1);
+    p_tot2 = zeros(steps,1);
     plotLabels = labels;
     
     for i = 1:steps
         for n = 1:N
             xx = m(n)*vx(n,i);
             yy = m(n)*vy(n,i);
-            P(n,i) =  xx + yy;
+            Px(n,i) = xx;
+            Py(n,i) = yy;
+            P(n,i) =  sqrt(xx^2 + yy^2);
         end
-        p_tot(i) = sum(P(:,i));
+       % p_tot(i) = sum(P(:,i));
+        p_totx(i) = sum(Px(:,i));
+        p_toty(i) = sum(Py(:,i));
+        p_tot2(i) = sqrt(sum(Px(:,i))^2 + sum(Py(:,i))^2);
     end
 
     figure
@@ -31,8 +43,14 @@ function plot_p(vx, vy,  m, t, labels)
     xlabel('t') 
     ylabel('p') 
     
-    plot(t, P);  
-    plot(t,p_tot)
+   
+  %  plot(t, P); 
+  % plot(t, Px); 
+    
+  %  plot(t,p_tot)
+   % plot(t,p_totx)
+    %plot(t,p_toty)
+    plot(t,p_tot2)
     
     plotLabels{N+1} = 'Sum';
     legend(plotLabels,'Location','northeast')
@@ -67,35 +85,37 @@ function plot_orbit(x,y,vx,vy,ax,ay,t,m, labels)
     hold on
     axis equal
     grid on
-    xlabel('x') 
-    ylabel('y') 
+    xlabel('x (m)') 
+    ylabel('y (m)') 
     
     s = ceil(length(x) / 10);
     plotLabels = labels;
     for i = 1:N 
         plot(x(i,:),y(i,:));
-        
-        % Plots velocity and acceleration
-        %quiver(x(1:s:end),y(1:s:end), vx(1:s:end),vy(1:s:end),1,'r')
-        %quiver(x(1:s:end),y(1:s:end), ax(1:s:end),ay(1:s:end),1,'g')
     end
-    
+    % Plots velocity and acceleration
+    %quiver(x(1:s:end),y(1:s:end), vx(1:s:end),vy(1:s:end),1,'r'); plotLabels{end+1} = 'Velocity'; 
+    %quiver(x(1:s:end),y(1:s:end), ax(1:s:end),ay(1:s:end),1,'g'); plotLabels{end+1} = 'Acceleration'; 
+        
    % plot center of mass 
     plot(rcmx,rcmy,'.');
-    plotLabels{end+1} = 'Center of mass';
-    
+    plotLabels{end+1} = 'Center of mass';  
     legend(plotLabels,'Location','southwest')
 end
+
+
+
 
 % plot Ek
 function plot_ek(vx, vy, m, t)
     Ek = compute_Ek(m, vx, vy);
     
     figure
-    title("Ek")
+    title("Kinetic energy")
     hold on
     grid on
     xlabel('t (s)') 
+    ylabel('Energy (J)')
     plot(t, Ek);
     legend(["Ek"],'Location','northeast');
 end
@@ -105,10 +125,11 @@ function plot_ep(x, y, G, m, t)
     Ep = compute_Ep(m, x, y, G);
     
     figure
-    title("Ep")
+    title("Potential energy")
     hold on
     grid on
-    xlabel('t (s)') 
+     xlabel('t (s)') 
+    ylabel('Energy (J)') 
   
     plot(t, Ep);
     legend(["Ep"],'Location','northeast');
@@ -120,10 +141,11 @@ function plot_ek_ep(x,y,vx, vy,  m, G, t)
     Ep = compute_Ep(m, x, y, G);
     
     figure
-    title("Ep and Ek")
+    title("Potential and kinetic energy")
     hold on
     grid on
     xlabel('t (s)') 
+    ylabel('Energy (J)')
 
     plot(t, Ek);
     plot(t, Ep);

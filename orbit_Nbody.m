@@ -1,6 +1,6 @@
 function [x,y,vx,vy,ax,ay,t]=orbit_Nbody(G,m,x0,y0,vx0,vy0,dt,tmax)
-%ORBIT_NBODY Summary of this function goes here
-%   Detailed explanation goes here
+%ORBIT_NBODY Orbit of N Bodies
+
 
 %Calculating time steps
 

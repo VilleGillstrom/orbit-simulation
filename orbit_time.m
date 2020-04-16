@@ -1,13 +1,17 @@
 function [time] = orbit_time(x,y,t)
 %ORBIT_BODY Time to orbit
-
+% Input:
+%   x - X positions
+%   y - Y Positions
+%   t - Time steps
+    
 x0 = x(1);
 y0 = y(1);
 v0 = [x0, y0] / norm([x0, y0]);
 
 time = 0;                      % Accumulated time
 hasReachedHalfOrbit = false;   % Has reached halfway
-cp = 1;           % Precious dot product
+cp = 1;                        % Previous dot product
 
 for i = 2:length(t)
     r = [x(i), y(i)] / norm([x(i), y(i)]); % Current vector to sattelite

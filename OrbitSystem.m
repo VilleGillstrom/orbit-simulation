@@ -79,19 +79,19 @@ classdef OrbitSystem < handle
         function os = SimpleSystem()
             os = OrbitSystem;
             os.G = 1.0;
-            planet      = struct('plot_label', 'planet', 'm', 10, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
-            satellite   = struct('plot_label', 'satellite' ,'m', 1, 'x', 10, 'y',0, 'vx', 0, 'vy', 0.75);
+            planet      = struct('plot_label', 'planet', 'm', 10, 'x', 0, 'y',0, 'vx', 0, 'vy', -0.75 * 0.01 / 10 );
+            satellite   = struct('plot_label', 'satellite' ,'m', 0.01, 'x', 10, 'y',0, 'vx', 0, 'vy', 0.75);
 
             os.add_body(planet);
             os.add_body(satellite)
             
             % This line adds celocity to the planet nr 1
             % to make center of  mass unchanging
-          %  os.staticify_center_of_mass(1);
+            %os.staticify_center_of_mass(1);
             
         end
         
-        %REQUIRES SMALL dt ~0.00001
+        
         function os = ISS() 
             os = OrbitSystem;
             os.G = 6.67408*10^-11;
@@ -100,15 +100,16 @@ classdef OrbitSystem < handle
             
             os.add_body(earth);
             os.add_body(iss);
-            os.staticify_center_of_mass(1);
+            %os.staticify_center_of_mass(1);
         end   
+        
+  
         
         %Faked orbit
         function os = SolarSystem()
             orbital_speed = @(G,M,R) sqrt(G*M./R);
             os = OrbitSystem;
-            %planets = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"] 
-            %os.G = 1.0;
+         
             os.G = 6.67408*10^-11;
             %Source google searches: <planet> mass, <planet> distance from sun
             sun     = struct('plot_label', 'Sun','m', 1.989E30, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
@@ -150,14 +151,52 @@ classdef OrbitSystem < handle
            % os.add_body(neptune);
            
            
-            os.staticify_center_of_mass(1);
+           % os.staticify_center_of_mass(1);
+        end
+        
+            %perihelion and aphelion from https://en.wikipedia.org/wiki/Apsis
+        function os = SolarSystemEllipse()
+            orbital_speed = @(G,M,R) sqrt(G*M./R);
+            
+            ec = @(r_per, r_ap)(r_ap-r_per)/(r_ap+r_per) ;
+            aa = @(r_per, r_ap) (r_per + r_ap) / 2;
+            v_per_ = @ (a, e, mu) sqrt ( ( (1 + e) * mu) /(( 1 - e) * a));
+            
+            vf = @(r_per, r_ap, mu)  v_per_(aa(r_per, r_ap), ec(r_per, r_ap), mu)
+            
+            os = OrbitSystem;
+      
+            os.G = 6.67408*10^-11;
+            %Source google searches: <planet> mass, <planet> distance from sun
+            sun     = struct('plot_label', 'Sun','m', 1.989E30, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
+                      
+            mercury = struct('plot_label', 'Mercury','m', 3.285E23, 'x',  	46001009E3, 'y',0, 'vx', 0);           
+            mercury.vy = vf( 46001009E3,    69817445E3 , os.G * sun.m); %
+                  
+            venus   = struct('plot_label', 'Venus','m', 4.876E24, 'x', 107476170E3, 'y',0, 'vx', 0);
+            venus.vy   = vf(107476170E3 ,  108942780E3 ,  os.G * sun.m)  ;
+            
+            earth   = struct('plot_label', 'Earth','m', 5.972E24, 'x', 147098291E3, 'y',0, 'vx', 0);
+            earth.vy   = vf(147098291E3 ,  152098233E3,  os.G * sun.m);
+           
+            mars    = struct('plot_label', 'Mars','m', 6.390E23, 'x', 206655215E3, 'y',0, 'vx', 0);
+            mars.vy    = vf(206655215E3 ,  249232432E3 ,  os.G * sun.m);
+          
+           
+            os.add_body(sun);
+            os.add_body(mercury);
+            os.add_body(venus);
+            os.add_body(earth);
+            os.add_body(mars);
+      
+          %  os.staticify_center_of_mass(1);
         end
    
          function os = SolarSystemTwoSuns()
             orbital_speed = @(G,M,R) sqrt(G*M./R);
             os = OrbitSystem;
             %planets = ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"] 
-            os.G = 1.0;
+            os.G = 6.67408*10^-11;
             %Source google searches: <planet> mass, <planet> distance from sun
             sun     = struct('plot_label', 'Sun','m', 1.989E30, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
             sun2     = struct('plot_label', 'Sun2','m', 1.989E30, 'x', -220.82E9*5, 'y',0, 'vx', 0, 'vy', 0);          
@@ -202,7 +241,7 @@ classdef OrbitSystem < handle
            % os.add_body(neptune);
            
            
-           os.staticify_center_of_mass(1);
+           %os.staticify_center_of_mass(1);
         end
         
     end

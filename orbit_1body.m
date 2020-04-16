@@ -1,13 +1,12 @@
 function [x,y,vx,vy,ax,ay,t]=orbit_1body(G,m,x0,y0,vx0,vy0,dt,tmax)
 %G gravitationskonstanten
 %m massa hos planeten
-%x0,y0 satellitens position vid t=0
-%vx0,vy0 plantens hastighet vid t=0
-%dt längden på tidsteget
-%tmax totala simuleringstiden
+%x0,y0 satellite position at t=0
+%vx0,vy0 satellite velocity at t=0
+%dt timestep
+%tmax simulation time
 
 %Calculating time steps
-
 t = 0:dt:tmax;
 
 steps=floor(tmax/dt);

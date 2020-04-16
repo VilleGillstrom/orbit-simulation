@@ -1,7 +1,7 @@
 function [] = orbit_1body_plotter(x,y,vx,vy,ax,ay,t, M, G, m)
     plot_orbit(x,y,vx,vy,ax,ay,t,m,M);   
     plot_ek_ep(x,y, vx, vy, M, m, G, t);
-    %plot_p(x,y, vx, vy, M, m, G, t);
+    plot_p(x,y, vx, vy, M, m, G, t);
 end
 
 
@@ -11,21 +11,22 @@ function [] = plot_p(x,y,vx, vy, M, m, G, t)
     P = zeros(steps,1);
     
     for i = 1:steps
-        P(i) = m*vx(i) + m*vy(i);
+        P(i) = sqrt(m*vx(i)^2 + m*vy(i)^2);
     end
+    
     
     figure
     title("Momentum") 
     hold on
     grid on
-    xlabel('t') 
-    ylabel('p') 
+    xlabel('t (s)') 
+    ylabel('p (kg*m/s)') 
     
     plot(t, P, 'b'); 
+
     
-    sum(P)
     
-    %legend({'y = Ek','y = Ep','y = Ep+Ek'},'Location','northeast')
+    
     
 end
 
@@ -47,8 +48,8 @@ function [] = plot_orbit(x,y,vx,vy,ax,ay,t,m,M)
     hold on
     axis equal
     grid on
-    xlabel('x') 
-    ylabel('y') 
+    xlabel('x (m)') 
+    ylabel('y (m)') 
     
     % plot planet
     plot(0,0,'o')
@@ -81,8 +82,8 @@ function [] = plot_ek_ep(x,y,vx, vy, M, m, G, t)
     title("Energy in system")
     hold on
     grid on
-    xlabel('t') 
- 
+    xlabel('t (s)') 
+    ylabel('Energy (J)') 
     
     plot(t, Ek, 'r'); 
     plot(t, Ep, 'b');
