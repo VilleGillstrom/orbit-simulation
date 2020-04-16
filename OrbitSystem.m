@@ -158,11 +158,11 @@ classdef OrbitSystem < handle
         function os = SolarSystemEllipse()
             orbital_speed = @(G,M,R) sqrt(G*M./R);
             
-            ec = @(r_per, r_ap)(r_ap-r_per)/(r_ap+r_per) ;
-            aa = @(r_per, r_ap) (r_per + r_ap) / 2;
+            e = @(r_per, r_ap)(r_ap-r_per)/(r_ap+r_per) ;
+            a = @(r_per, r_ap) (r_per + r_ap) / 2;
             v_per_ = @ (a, e, mu) sqrt ( ( (1 + e) * mu) /(( 1 - e) * a));
             
-            vf = @(r_per, r_ap, mu)  v_per_(aa(r_per, r_ap), ec(r_per, r_ap), mu)
+            v_per = @(r_per, r_ap, mu)  v_per_(a(r_per, r_ap), e(r_per, r_ap), mu)
             
             os = OrbitSystem;
       
@@ -171,16 +171,16 @@ classdef OrbitSystem < handle
             sun     = struct('plot_label', 'Sun','m', 1.989E30, 'x', 0, 'y',0, 'vx', 0, 'vy', 0);
                       
             mercury = struct('plot_label', 'Mercury','m', 3.285E23, 'x',  	46001009E3, 'y',0, 'vx', 0);           
-            mercury.vy = vf( 46001009E3,    69817445E3 , os.G * sun.m); %
+            mercury.vy = v_per( 46001009E3,    69817445E3 , os.G * sun.m); %
                   
             venus   = struct('plot_label', 'Venus','m', 4.876E24, 'x', 107476170E3, 'y',0, 'vx', 0);
-            venus.vy   = vf(107476170E3 ,  108942780E3 ,  os.G * sun.m)  ;
+            venus.vy   = v_per(107476170E3 ,  108942780E3 ,  os.G * sun.m)  ;
             
             earth   = struct('plot_label', 'Earth','m', 5.972E24, 'x', 147098291E3, 'y',0, 'vx', 0);
-            earth.vy   = vf(147098291E3 ,  152098233E3,  os.G * sun.m);
+            earth.vy   = v_per(147098291E3 ,  152098233E3,  os.G * sun.m);
            
             mars    = struct('plot_label', 'Mars','m', 6.390E23, 'x', 206655215E3, 'y',0, 'vx', 0);
-            mars.vy    = vf(206655215E3 ,  249232432E3 ,  os.G * sun.m);
+            mars.vy    = v_per(206655215E3 ,  249232432E3 ,  os.G * sun.m);
           
            
             os.add_body(sun);
