@@ -4,7 +4,7 @@
 %run_simplesystem();
 %run_iss();
 %run_solarsystem();
-run_solarsystem_ellipse();
+sse = run_solarsystem_ellipse();
 %run_solarsystem_twosuns();
 %return;
 
@@ -24,18 +24,20 @@ end
 
 function [os] = run_solarsystem_ellipse()
     os = OrbitSystem.SolarSystemEllipse();
-    tic; os.simulate(50, (1188E5) ); toc;
+   % tic; os.simulate(50, (594E5) ); toc;
+    tic; os.simulate(1000, (1.44E6 * 60*60) ); toc;
     tic; os.plot();toc;
     
-    [mercury_time] = orbit_time(os.x(2,:), os.y(2,:),os.t) / (60 *60)
-    [venus_time] = orbit_time(os.x(3,:), os.y(3,:),os.t)/ (60 *60)
-    [earth_time] = orbit_time(os.x(4,:), os.y(4,:),os.t)/ (60 *60)
-    [mars_time] = orbit_time(os.x(5,:), os.y(5,:),os.t)/ (60 *60)
+   % [mercury_time] = orbit_time(os.x(2,:), os.y(2,:),os.t) / (60 *60)
+   % [venus_time] = orbit_time(os.x(3,:), os.y(3,:),os.t)/ (60 *60)
+   % [earth_time] = orbit_time(os.x(4,:), os.y(4,:),os.t)/ (60 *60)
+   % [mars_time] = orbit_time(os.x(5,:), os.y(5,:),os.t)/ (60 *60)
 end
 
 function [os] = run_solarsystem()
     os = OrbitSystem.SolarSystem();
-    tic; os.simulate(50, (1188E5) ); toc;
+    tic; os.simulate(200, (594E5 ) ); toc;
+   
     tic; os.plot();toc;
     
     [mercury_time] = orbit_time(os.x(2,:), os.y(2,:),os.t)

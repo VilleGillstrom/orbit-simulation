@@ -162,7 +162,7 @@ classdef OrbitSystem < handle
             a = @(r_per, r_ap) (r_per + r_ap) / 2;
             v_per_ = @ (a, e, mu) sqrt ( ( (1 + e) * mu) /(( 1 - e) * a));
             
-            v_per = @(r_per, r_ap, mu)  v_per_(a(r_per, r_ap), e(r_per, r_ap), mu)
+            v_per = @(r_per, r_ap, mu)  v_per_(a(r_per, r_ap), e(r_per, r_ap), mu);
             
             os = OrbitSystem;
       
@@ -178,18 +178,32 @@ classdef OrbitSystem < handle
             
             earth   = struct('plot_label', 'Earth','m', 5.972E24, 'x', 147098291E3, 'y',0, 'vx', 0);
             earth.vy   = v_per(147098291E3 ,  152098233E3,  os.G * sun.m);
-           
+
             mars    = struct('plot_label', 'Mars','m', 6.390E23, 'x', 206655215E3, 'y',0, 'vx', 0);
             mars.vy    = v_per(206655215E3 ,  249232432E3 ,  os.G * sun.m);
-          
+           
+            jupiter = struct('plot_label', 'Jupiter','m', 1.898E27, 'x', 740679835E3,  'y',0, 'vx', 0);
+            jupiter.vy = v_per(740679835E3 ,  816001807E3  ,  os.G * sun.m);
+            
+            saturn  = struct('plot_label', 'Saturn','m', 5.683E26, 'x', 1349823615E3, 'y',0, 'vx', 0);
+            saturn.vy = v_per(1349823615E3 ,  1503509229E3 ,  os.G * sun.m);
+           
+            uranus  = struct('plot_label', 'Uranus','m', 8.681E25, 'x', 2734998229E3,  'y',0, 'vx', 0);
+            uranus.vy = v_per(2734998229E3 ,  3006318143E3 ,  os.G * sun.m);
+           
+            neptune = struct('plot_label', 'Neptune','m', 1.024E26, 'x', 4459753056E3, 'y',0, 'vx', 0);
+            neptune.vy = v_per(4459753056E3,  4537039826E3 ,  os.G * sun.m);
            
             os.add_body(sun);
             os.add_body(mercury);
             os.add_body(venus);
             os.add_body(earth);
             os.add_body(mars);
+            os.add_body(saturn);
+            os.add_body(uranus);
+            os.add_body(neptune);
       
-          %  os.staticify_center_of_mass(1);
+            os.staticify_center_of_mass(1);
         end
    
          function os = SolarSystemTwoSuns()
@@ -234,7 +248,8 @@ classdef OrbitSystem < handle
             os.add_body(mercury);
             os.add_body(venus);
             os.add_body(earth);
-            os.add_body(mars);
+            
+            %os.add_body(mars);
            % os.add_body(jupiter);
            % os.add_body(saturn);
            % os.add_body(uranus);
